@@ -21,10 +21,12 @@ app.get("/api/users", (req, res) => {
     res.send(users);
 });
 
-app.get("/api/users/:id", async (req, res) => {
-    const data = await fs.readFile(filePath, "utf-8");
+app.get("/api/users/:id", (req, res) => {
+    const id = req.params.id;
+
+    const data = fs.readFileSync(filePath, "utf-8");
     const users = JSON.parse(data);
-    const user = null;
+    let user = null;
     for(let i = 0; i < users.length; i++) {
         if(users[i].id == id) {
             user = users[i];
@@ -39,14 +41,14 @@ app.get("/api/users/:id", async (req, res) => {
     }
 });
 
-app.post("/api/users", async (req, res) => {
+app.post("/api/users", (req, res) => {
     if(!req.body) return res.sendStatus(400);
 
     const userName = req.body.name;
     const userAge = req.body.age;
     let user = {id: null, name: userName, age: userAge}
 
-    let data = await fs.readFile(filePath, "utf-8");
+    let data = fs.readFileSync(filePath, "utf-8");
     let users = JSON.parse(data);
 
     const id = Math.max.apply(Math, users.map(u => u.id))
@@ -55,14 +57,14 @@ app.post("/api/users", async (req, res) => {
     users.push(user);
     data = JSON.stringify(users);
 
-    await fs.writeFile("users.json", data);
+    fs.writeFileSync("users.json", data);
     res.send(user);
 });
 
-app.delete("/api/users/:id", async (req, res) => {
+app.delete("/api/users/:id", (req, res) => {
     const id = req.params.id;
 
-    let data = await fs.readFile(filePath, "utf-8");
+    let data = fs.readFileSync(filePath, "utf-8");
     let users = JSON.parse(data);
     let user = null;
     let index = null;
@@ -78,21 +80,21 @@ app.delete("/api/users/:id", async (req, res) => {
     if(user) {
         users.splice(index, 1);
         data = JSON.stringify(users);
-        await fs.writeFile(filePath, data);
+        fs.writeFileSync(filePath, data);
         res.send(user);
     } else {
         res.status(404).send();
     }
 });
 
-app.put("/api/users", async (req, res) => {
+app.put("/api/users", (req, res) => {
     if(!req.body) return res.sendStatus(400);
 
     const userId = req.body.id;
     const userName = req.body.name;
     const userAge = req.body.age;
 
-    let data = await fs.readFile(filePath, "utf-8");
+    let data = fs.readFileSync(filePath, "utf-8");
     const users = JSON.parse(data);
     let user = null;
     for(let i = 0; i < users.length; i++) {
@@ -106,7 +108,7 @@ app.put("/api/users", async (req, res) => {
         user.name = userName;
         user.age = userAge;
         data = JSON.stringify(users);
-        await fs.writeFile(filePath, data);
+        fs.writeFileSync(filePath, data);
         res.send(user);
     } else {
         res.status(404).send(user);
