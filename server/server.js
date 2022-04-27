@@ -5,16 +5,18 @@ const path = require("path");
 const app = express();
 app.use(express.json());
 
+app.use(express.static(path.join(__dirname, "../client")));
+
 let indexHTML = path.join(__dirname, "../client/index.html");
 
 app.get("/", (req, res) => {
     res.sendFile(indexHTML);
 })
 
-const filePath = "./users.json";
+const filePath = path.join(__dirname + "/users.json");
 
-app.get("/api/users", async (req, res) => {
-    const data = await fs.readFile(filePath, "utf-8");
+app.get("/api/users", (req, res) => {
+    const data = fs.readFileSync(filePath, "utf-8");
     const users = JSON.parse(data);
     res.send(users);
 });
